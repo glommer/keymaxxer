@@ -19,6 +19,11 @@ function pinentryEscape(s: string): string {
   return s.replace(/%/g, "%25").replace(/\n/g, "%0A").replace(/\r/g, "%0D");
 }
 
+/** Zenity uses underscores in label text as GTK mnemonic markers. */
+export function zenityEscapeText(s: string): string {
+  return s.replace(/_/g, "__");
+}
+
 function parsePinentryData(stdout: string): string | null {
   for (const line of stdout.split("\n")) {
     if (line.startsWith("D ")) return line.slice(2).replace(/%0A/g, "\n").replace(/%0D/g, "\r").replace(/%25/g, "%");
@@ -70,8 +75,9 @@ export async function promptTextLinux(message: string, prefill: string, saveLabe
     "--entry",
     "--title",
     "keymaxxer - add secret",
+    "--no-markup",
     "--text",
-    message,
+    zenityEscapeText(message),
     "--entry-text",
     prefill,
     "--ok-label",
@@ -89,8 +95,9 @@ export async function confirmSaveLinux(message: string): Promise<"save" | "edit"
     "--question",
     "--title",
     "keymaxxer - add secret",
+    "--no-markup",
     "--text",
-    message,
+    zenityEscapeText(message),
     "--ok-label",
     "Save",
     "--cancel-label",
@@ -107,8 +114,9 @@ export async function approveLinux(message: string): Promise<"deny" | "once" | "
     "--radiolist",
     "--title",
     "keymaxxer - approve secret use",
+    "--no-markup",
     "--text",
-    message,
+    zenityEscapeText(message),
     "--column",
     "",
     "--column",
