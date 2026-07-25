@@ -30,6 +30,7 @@ Secrets:
   keymaxxer rm <NAME>            Delete a secret
   keymaxxer run --secrets a,b -- <cmd>   Run a command with secrets injected as env vars
   keymaxxer audit [--limit N]    Show recent secret-access log
+  keymaxxer compact              Checkpoint and truncate accumulated vault WAL data
 
 Agent integration:
   keymaxxer serve                Start the MCP server on stdio (holds the key for the session)
@@ -226,6 +227,17 @@ async function main() {
         const status = e.outcome === "denied" ? "DENIED" : `exit=${e.exitCode}`;
         console.log(`${e.ts}  ${status}  [${e.secrets.join(", ")}]  ${e.command}`);
       }
+      return;
+    }
+
+    case "compact": {
+      const store = await openVaultCli();
+      try {
+        await store.compact();
+      } finally {
+        await store.close();
+      }
+      console.log("✓ Vault WAL compacted.");
       return;
     }
 

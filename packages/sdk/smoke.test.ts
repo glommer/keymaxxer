@@ -47,6 +47,8 @@ try {
   check("scrubbed with ***", r1.stdout.includes("***"));
   check("current value absent from stdout", !r1.stdout.includes("ghp_rotatedvalue456"));
   check("redaction counted", r1.redactions >= 1);
+  const postRunMetas = await store.list();
+  check("metadata remains readable after an audited run", postRunMetas.length === 2);
 
   // stderr is scrubbed just like stdout
   const r1e = await store.run({ command: 'echo "err: $GITHUB_TOKEN" 1>&2', secrets: ["GITHUB_TOKEN"] });
@@ -78,6 +80,10 @@ try {
   await store.auditDenied(["GITHUB_TOKEN"], "echo $GITHUB_TOKEN", "/tmp");
   const audit2 = await store.recentAudit();
   check("denied attempt is recorded as 'denied'", audit2.some((e) => e.outcome === "denied"));
+
+  const compacted = await store.compact();
+  check("WAL compaction completes while the vault is open", compacted.logPages === 0);
+  check("metadata remains readable after WAL compaction", (await store.list()).length === 2);
 
   // encryption at rest: raw file must not contain plaintext or SQLite header
   const raw = await Bun.file(path).arrayBuffer();

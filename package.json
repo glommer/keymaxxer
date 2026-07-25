@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",
-    "@tursodatabase/database": "^0.6.1",
+    "@tursodatabase/database": "^0.7.0",
     "zod": "^4.4.3"
   },
   "devDependencies": {
