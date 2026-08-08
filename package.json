@@ -1,6 +1,6 @@
 {
   "name": "keymaxxer",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Secret manager for coding agents — run commands that use your API keys and tokens without ever exposing the secret to the model.",
   "type": "module",
   "bin": {
