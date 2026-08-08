@@ -7,6 +7,6 @@
     ".": "./src/index.ts"
   },
   "dependencies": {
-    "@tursodatabase/database": "latest"
+    "@tursodatabase/database": "^0.7.0"
   }
 }

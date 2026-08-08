@@ -85,6 +85,23 @@ export class SecretStore {
     }
   }
 
+  /** Checkpoint committed WAL frames and truncate the WAL file. */
+  async compact(): Promise<{ logPages: number; checkpointedPages: number }> {
+    const [row] = (await this.db.prepare(`PRAGMA wal_checkpoint(TRUNCATE)`).all()) as Array<{
+      busy: number | bigint;
+      log: number | bigint;
+      checkpointed: number | bigint;
+    }>;
+    if (!row) throw new Error("WAL checkpoint returned no result.");
+    if (Number(row.busy) !== 0) {
+      throw new Error("Vault is busy; stop other keymaxxer processes and retry.");
+    }
+    return {
+      logPages: Number(row.log),
+      checkpointedPages: Number(row.checkpointed),
+    };
+  }
+
   /** Optional structured columns added after the initial release. */
   private static readonly META_COLUMNS = ["provider", "account", "environment", "access", "description"];
 
