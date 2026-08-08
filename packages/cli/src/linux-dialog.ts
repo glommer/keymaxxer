@@ -6,7 +6,7 @@ function run(command: string, args: string[], input?: string): Promise<DialogRes
   return new Promise((resolve) => {
     const proc = spawn(command, args, { stdio: [input ? "pipe" : "ignore", "pipe", "ignore"] });
     let stdout = "";
-    proc.stdout.on("data", (c) => (stdout += c.toString()));
+    proc.stdout?.on("data", (c) => (stdout += c.toString()));
     proc.on("error", () => resolve(null));
     proc.on("close", (code) => resolve({ code, stdout }));
     if (input && proc.stdin) {
