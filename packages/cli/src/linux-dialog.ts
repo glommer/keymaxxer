@@ -107,32 +107,40 @@ export async function confirmSaveLinux(message: string): Promise<"save" | "edit"
   return res.code === 0 ? "save" : "edit";
 }
 
+/**
+ * Map a zenity --question + --extra-button response to an approval decision.
+ * OK (exit 0) = Allow once; extra button stdout = Allow session; cancel/close = Deny.
+ */
+export function parseApproveZenityResult(code: number | null, stdout: string): "deny" | "once" | "session" | null {
+  if (code === null) return null;
+  if (code === 0) return "once";
+  if (stdout.trim() === "Allow session") return "session";
+  return "deny";
+}
+
 export async function approveLinux(message: string): Promise<"deny" | "once" | "session" | null> {
   if (process.platform !== "linux") return null;
+  // Prefer a compact --question dialog over --list --radiolist: the list dialog is a
+  // large normal toplevel that tiling WMs (Hyprland/Omarchy) treat as a regular window.
   const zenity = await run("zenity", [
-    "--list",
-    "--radiolist",
+    "--question",
     "--title",
     "keymaxxer - approve secret use",
     "--no-markup",
     "--text",
     zenityEscapeText(message),
-    "--column",
-    "",
-    "--column",
-    "Decision",
-    "FALSE",
-    "Deny",
-    "TRUE",
+    "--ellipsize",
+    "--width",
+    "520",
+    "--ok-label",
     "Allow once",
-    "FALSE",
+    "--extra-button",
     "Allow session",
+    "--cancel-label",
+    "Deny",
   ]);
-  if (zenity && zenity.code === 0) {
-    const choice = zenity.stdout.trim();
-    if (choice === "Allow session") return "session";
-    if (choice === "Allow once") return "once";
-    return "deny";
+  if (zenity) {
+    return parseApproveZenityResult(zenity.code, zenity.stdout);
   }
 
   const allowed = await confirmPinentry(message);
