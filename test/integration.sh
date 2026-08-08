@@ -70,6 +70,24 @@ contains "passphrase-derived key opens the vault" "$(HOME="$T2" KEYMAXXER_PASSPH
 contains "wrong passphrase is rejected" "$(HOME="$T2" KEYMAXXER_PASSPHRASE=nope $SH list 2>&1)" "wrong passphrase"
 rm -rf "$T2"
 
+echo "## vault path overrides"
+T3=$(mktemp -d)
+TX=$(mktemp -d)
+export HOME="$T3"
+unset XDG_CONFIG_HOME KEYMAXXER_DB_DIR
+# XDG set but dir missing → still ~/.keymaxxer
+contains "XDG missing dir falls back" "$(XDG_CONFIG_HOME="$TX" KEYMAXXER_MASTER_KEY=$K $SH init 2>&1)" "Vault created"
+if [ -d "$T3/.keymaxxer" ] && [ ! -d "$TX/keymaxxer" ]; then pass "init used ~/.keymaxxer when XDG dir absent"; else fail "init should use ~/.keymaxxer when XDG dir absent"; fi
+rm -rf "$T3/.keymaxxer"
+# XDG dir exists → use it
+mkdir -p "$TX/keymaxxer"
+contains "XDG existing dir is used" "$(XDG_CONFIG_HOME="$TX" KEYMAXXER_MASTER_KEY=$K $SH init 2>&1)" "$TX/keymaxxer/vault.db"
+# KEYMAXXER_DB_DIR wins, no fallback
+TO=$(mktemp -d)
+contains "KEYMAXXER_DB_DIR overrides" "$(KEYMAXXER_DB_DIR="$TO" XDG_CONFIG_HOME="$TX" KEYMAXXER_MASTER_KEY=$K $SH init 2>&1)" "$TO/vault.db"
+if [ -f "$TO/vault.db" ]; then pass "KEYMAXXER_DB_DIR vault file exists"; else fail "KEYMAXXER_DB_DIR vault file missing"; fi
+rm -rf "$T3" "$TX" "$TO"
+
 echo
 if [ "$KO" -eq 0 ]; then
   echo "ALL PASSED ($OK checks)"

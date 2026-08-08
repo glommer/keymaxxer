@@ -1,7 +1,7 @@
 export { scrub, REDACTION } from "./scrubber.js";
 export { runWithSecrets } from "./runner.js";
 export type { RunnerOptions } from "./runner.js";
-export { SecretStore, defaultVaultPath, DEFAULT_CIPHER, WrongKeyError } from "./store.js";
+export { SecretStore, defaultVaultDir, defaultVaultPath, DEFAULT_CIPHER, WrongKeyError } from "./store.js";
 export type { OpenOptions } from "./store.js";
 export { deriveKey, generateSalt, hexEqual, DEFAULT_SCRYPT } from "./kdf.js";
 export type { ScryptParams } from "./kdf.js";

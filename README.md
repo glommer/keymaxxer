@@ -133,10 +133,13 @@ otherwise misuse a credential (see the threat model). For headless/CI, set
 
 ## Where things live, and how access is controlled
 
-- **Vault:** one global `~/.keymaxxer/vault.db` per user, in `~/.keymaxxer`
-  (directory `0700` — only you can read it).
+- **Vault:** one global `vault.db` per user (directory `0700` — only you can read it).
+  Location resolution:
+  1. `KEYMAXXER_DB_DIR` if set (no fallback)
+  2. `$XDG_CONFIG_HOME/keymaxxer` if `XDG_CONFIG_HOME` is set and that directory exists
+  3. otherwise `~/.keymaxxer`
 - **Encryption key:** **stored nowhere.** It is derived from your passphrase
-  with scrypt (a non-secret salt lives in `~/.keymaxxer/vault.meta.json`). Copying
+  with scrypt (a non-secret salt lives in `vault.meta.json` next to the vault). Copying
   `vault.db` off the machine yields nothing — there is no key at rest.
 - **Who holds the key:** each process that needs it, only while it runs — an MCP
   server for its session, a CLI command for one invocation. There is **no shared
@@ -183,7 +186,7 @@ isolation, run the agent as a separate user or in a sandbox — it composes clea
 The whole vault is one Turso database opened with native encryption:
 
 ```ts
-const db = await connect("~/.keymaxxer/vault.db", {
+const db = await connect(defaultVaultPath(), {
   encryption: { cipher: "aes256gcm", hexkey },  // hexkey = scrypt(passphrase, salt)
 });
 ```

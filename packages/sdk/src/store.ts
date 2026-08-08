@@ -1,17 +1,14 @@
 import { connect } from "@tursodatabase/database";
 import { chmodSync, mkdirSync } from "node:fs";
-import { homedir } from "node:os";
-import { dirname, join } from "node:path";
+import { dirname } from "node:path";
+import { defaultVaultPath } from "./paths.js";
 import { runWithSecrets } from "./runner.js";
 import type { AuditEntry, RunRequest, RunResult, SecretFields, SecretMeta } from "./types.js";
 
+export { defaultVaultDir, defaultVaultPath } from "./paths.js";
+
 /** The cipher used for whole-database encryption at rest. */
 export const DEFAULT_CIPHER = "aes256gcm";
-
-/** Default vault location: a single global vault for the user. */
-export function defaultVaultPath(): string {
-  return join(homedir(), ".keymaxxer", "vault.db");
-}
 
 export interface OpenOptions {
   path?: string;
