@@ -18,13 +18,13 @@
     "test": "bun test packages/sdk/paths.test.ts && bun packages/sdk/smoke.test.ts && bun packages/cli/approval.test.ts && bun packages/cli/addsecret.test.ts && bun packages/cli/linux-dialog.test.ts && bash test/integration.sh"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.29.0",
-    "@tursodatabase/database": "^0.7.0",
-    "zod": "^4.4.3"
+    "@modelcontextprotocol/sdk": "^1.32.2",
+    "@tursodatabase/database": "^0.8.4",
+    "zod": "^4.6.7"
   },
   "devDependencies": {
-    "@types/bun": "^1.3.14",
-    "typescript": "^5.0.0"
+    "@types/bun": "^1.4.5",
+    "typescript": "^7.0.2"
   },
   "workspaces": [
     "packages/*"

@@ -6,8 +6,8 @@
     "keymaxxer": "src/index.ts"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "latest",
+    "@modelcontextprotocol/sdk": "^1.32.2",
     "keymaxxer-sdk": "workspace:*",
-    "zod": "latest"
+    "zod": "^4.6.7"
   }
 }
